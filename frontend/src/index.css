@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Font scaling classes applied on root html/body by AccessibilityContext */
+  html.font-scale-normal {
+    font-size: 16px;
+  }
+  html.font-scale-large {
+    font-size: 19px;
+  }
+  html.font-scale-xlarge {
+    font-size: 22px;
+  }
+
+  /* Dyslexia-friendly typography mode */
+  body.dyslexia-mode,
+  .dyslexia-text {
+    font-family: 'OpenDyslexic', 'Comic Sans MS', 'Trebuchet MS', sans-serif !important;
+    letter-spacing: 0.06em !important;
+    word-spacing: 0.14em !important;
+    line-height: 1.85 !important;
+  }
+
+  /* WCAG 2.1 AAA High-Contrast Mode */
+  body.high-contrast-mode {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  body.high-contrast-mode .hc-card {
+    background-color: #09090b !important;
+    color: #ffffff !important;
+    border: 2px solid #facc15 !important;
+  }
+
+  body.high-contrast-mode .hc-nav {
+    background-color: #000000 !important;
+    border-color: #facc15 !important;
+  }
+
+  body.high-contrast-mode .hc-button-primary {
+    background-color: #facc15 !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+    font-weight: 800 !important;
+  }
+
+  body.high-contrast-mode .hc-input {
+    background-color: #000000 !important;
+    color: #fef08a !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  body.high-contrast-mode a,
+  body.high-contrast-mode .hc-accent {
+    color: #facc15 !important;
+  }
+}
+
+/* Explicit visible keyboard focus rings across all interactive elements */
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px #2563eb;
+}
+
+body.high-contrast-mode *:focus-visible {
+  outline: 3px solid #facc15 !important;
+  box-shadow: 0 0 0 4px #ffffff !important;
+}
+

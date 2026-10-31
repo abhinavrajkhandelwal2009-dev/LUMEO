@@ -1,0 +1,57 @@
+services:
+  # 1. Core Backend System (Connects to Supabase & Google Gemini, Deployed on Render)
+  - type: web
+    name: lumeo-backend-api
+    env: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: CLIENT_VERCEL_URL
+        value: https://lumeo-client.vercel.app
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_DB_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+
+  # 2. Dedicated Server Gateway System (Orchestrates Vercel Client <-> Render Backend)
+  - type: web
+    name: lumeo-server-gateway
+    env: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/server/status
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVER_PORT
+        value: 4000
+      - key: RENDER_BACKEND_URL
+        value: https://lumeo-backend.onrender.com
+      - key: VERCEL_CLIENT_URL
+        value: https://lumeo-client.vercel.app
+      - key: SUPABASE_SERVICE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+

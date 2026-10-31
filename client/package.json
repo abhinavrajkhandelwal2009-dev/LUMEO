@@ -1,0 +1,13 @@
+{
+  "name": "lumeo-client-vercel",
+  "private": true,
+  "version": "1.0.0",
+  "description": "LUMEO Client System (Vercel Link-Up)",
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix ../frontend run dev",
+    "build": "npm --prefix ../frontend run build",
+    "preview": "npm --prefix ../frontend run preview"
+  }
+}
+

@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "name": "lumeo-client",
+  "framework": "vite",
+  "buildCommand": "npm --prefix ../frontend run build",
+  "outputDirectory": "../frontend/dist",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://lumeo-backend.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+
