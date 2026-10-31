@@ -2,8 +2,9 @@
   "version": 2,
   "name": "lumeo-client",
   "framework": "vite",
-  "buildCommand": "npm --prefix ../frontend run build",
-  "outputDirectory": "../frontend/dist",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/api/:path*",
@@ -15,4 +16,3 @@
     }
   ]
 }
-

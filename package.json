@@ -1,0 +1,14 @@
+{
+  "name": "lumeo-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "LUMEO – Technology That Understands Every Ability (Client, Server, Backend)",
+  "type": "module",
+  "scripts": {
+    "install:client": "npm --prefix client install",
+    "build": "npm --prefix client install && npm --prefix client run build",
+    "dev:client": "npm --prefix client run dev",
+    "start:backend": "npm --prefix backend start",
+    "start:server": "npm --prefix server start"
+  }
+}
