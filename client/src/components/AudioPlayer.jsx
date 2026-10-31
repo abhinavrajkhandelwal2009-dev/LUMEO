@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Play, Pause, Square, Volume2, VolumeX, Copy, Check } from 'lucide-react';
 import { useAccessibility } from '../context/AccessibilityContext';
 
-export default function AudioPlayer({ text, title = 'Audio Narration' }) {
+export default function AudioPlayer({ text, title = 'Audio Output Synthesizer' }) {
   const { prefs, updatePreferences } = useAccessibility();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -74,19 +74,28 @@ export default function AudioPlayer({ text, title = 'Audio Narration' }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback
+      // ignore
     }
   };
 
+  const safeId = title.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+
   return (
     <div
-      className="hc-card bg-slate-100 border border-slate-300 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4"
+      className="lumeo-card rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 border border-amber-500/30"
       role="region"
       aria-label={title}
     >
-      <div className="flex items-center gap-2">
-        <Volume2 className="w-5 h-5 text-blue-700 hc-accent" aria-hidden="true" />
-        <span className="font-semibold text-sm text-slate-800 hc-accent">{title}</span>
+      <div className="flex items-center gap-2.5">
+        <span className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-amber-400">
+          <Volume2 className="w-5 h-5" aria-hidden="true" />
+        </span>
+        <div>
+          <span className="block font-bold text-sm">{title}</span>
+          <span className="block text-xs opacity-75">
+            {isPlaying ? 'Speaking aloud now...' : 'Ready for natural voice playback'}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -95,18 +104,18 @@ export default function AudioPlayer({ text, title = 'Audio Narration' }) {
             type="button"
             onClick={handlePlay}
             disabled={!text || prefs.globalMute}
-            aria-label={isPaused ? 'Resume speech playback' : 'Play text-to-speech audio'}
-            className="hc-button-primary inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-blue-700 text-white text-sm font-medium hover:bg-blue-800 disabled:opacity-50 focus:ring-4 focus:ring-blue-600"
+            aria-label={isPaused ? 'Resume audio playback' : 'Play audio output'}
+            className="lumeo-btn-primary inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm disabled:opacity-40"
           >
-            <Play className="w-4 h-4" aria-hidden="true" />
-            <span>{isPaused ? 'Resume' : 'Listen'}</span>
+            <Play className="w-4 h-4 fill-current" aria-hidden="true" />
+            <span>{isPaused ? 'Resume Audio' : 'Speak Output'}</span>
           </button>
         ) : (
           <button
             type="button"
             onClick={handlePause}
-            aria-label="Pause speech playback"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-700 focus:ring-4 focus:ring-blue-600"
+            aria-label="Pause audio playback"
+            className="lumeo-btn-secondary inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border-amber-400"
           >
             <Pause className="w-4 h-4" aria-hidden="true" />
             <span>Pause</span>
@@ -117,8 +126,8 @@ export default function AudioPlayer({ text, title = 'Audio Narration' }) {
           <button
             type="button"
             onClick={handleStop}
-            aria-label="Stop speech playback"
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-800 focus:ring-4 focus:ring-blue-600"
+            aria-label="Stop audio playback"
+            className="lumeo-btn-secondary inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-sm"
           >
             <Square className="w-4 h-4" aria-hidden="true" />
             <span>Stop</span>
@@ -126,11 +135,11 @@ export default function AudioPlayer({ text, title = 'Audio Narration' }) {
         )}
 
         <div className="flex items-center gap-2 text-xs">
-          <label htmlFor={`rate-${title}`} className="font-medium text-slate-700 hc-accent">
-            Speed: {rate}x
+          <label htmlFor={`rate-${safeId}`} className="font-semibold">
+            Speed {rate}x
           </label>
           <input
-            id={`rate-${title}`}
+            id={`rate-${safeId}`}
             type="range"
             min="0.5"
             max="2.0"
@@ -142,16 +151,16 @@ export default function AudioPlayer({ text, title = 'Audio Narration' }) {
               updatePreferences({ speechRate: next }, false);
             }}
             aria-label="Speech playback speed"
-            className="w-20 accent-blue-700 focus:ring-4 focus:ring-blue-600"
+            className="w-20 accent-amber-400"
           />
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <label htmlFor={`pitch-${title}`} className="font-medium text-slate-700 hc-accent">
-            Pitch: {pitch}
+          <label htmlFor={`pitch-${safeId}`} className="font-semibold">
+            Pitch {pitch}
           </label>
           <input
-            id={`pitch-${title}`}
+            id={`pitch-${safeId}`}
             type="range"
             min="0.5"
             max="1.8"
@@ -159,37 +168,36 @@ export default function AudioPlayer({ text, title = 'Audio Narration' }) {
             value={pitch}
             onChange={(e) => setPitch(parseFloat(e.target.value))}
             aria-label="Speech pitch"
-            className="w-16 accent-blue-700 focus:ring-4 focus:ring-blue-600"
+            className="w-16 accent-teal-400"
           />
         </div>
 
         <button
           type="button"
           onClick={handleCopy}
-          aria-label="Copy text to clipboard"
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-800 text-sm font-medium hover:bg-slate-50 focus:ring-4 focus:ring-blue-600"
+          aria-label="Copy output text to clipboard"
+          className="lumeo-btn-secondary inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold"
         >
           {copied ? (
             <>
-              <Check className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+              <Check className="w-4 h-4 text-teal-400" aria-hidden="true" />
               <span>Copied</span>
             </>
           ) : (
             <>
               <Copy className="w-4 h-4" aria-hidden="true" />
-              <span>Copy</span>
+              <span>Copy Text</span>
             </>
           )}
         </button>
 
         {prefs.globalMute && (
-          <span className="inline-flex items-center gap-1 text-xs text-red-700 font-semibold">
+          <span className="inline-flex items-center gap-1 text-xs text-rose-400 font-bold">
             <VolumeX className="w-4 h-4" aria-hidden="true" />
-            Muted globally
+            TTS Muted
           </span>
         )}
       </div>
     </div>
   );
 }
-

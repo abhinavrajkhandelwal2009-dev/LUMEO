@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 
+// 7 Essential Streamlined Core Accessibility Hubs
 import SignLanguageModule from './pages/modules/SignLanguageModule';
 import VisualAssistantModule from './pages/modules/VisualAssistantModule';
 import TtsSttModule from './pages/modules/TtsSttModule';
@@ -17,13 +18,6 @@ import TranslatorModule from './pages/modules/TranslatorModule';
 import DyslexiaReaderModule from './pages/modules/DyslexiaReaderModule';
 import EducationModule from './pages/modules/EducationModule';
 import EmergencyModule from './pages/modules/EmergencyModule';
-import GovernmentModule from './pages/modules/GovernmentModule';
-import TransportModule from './pages/modules/TransportModule';
-import ColorIdModule from './pages/modules/ColorIdModule';
-import WebsiteAuditModule from './pages/modules/WebsiteAuditModule';
-import MentalHealthModule from './pages/modules/MentalHealthModule';
-import MathAssistantModule from './pages/modules/MathAssistantModule';
-import JobAssistantModule from './pages/modules/JobAssistantModule';
 
 export default function App() {
   return (
@@ -40,7 +34,7 @@ export default function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<Profile />} />
 
-                {/* All 15 Mandatory Accessibility Modules */}
+                {/* 7 Core Accessibility Modules */}
                 <Route path="/modules/sign-language" element={<SignLanguageModule />} />
                 <Route path="/modules/visual-assistant" element={<VisualAssistantModule />} />
                 <Route path="/modules/tts-stt" element={<TtsSttModule />} />
@@ -48,13 +42,6 @@ export default function App() {
                 <Route path="/modules/dyslexia-reader" element={<DyslexiaReaderModule />} />
                 <Route path="/modules/education" element={<EducationModule />} />
                 <Route path="/modules/emergency" element={<EmergencyModule />} />
-                <Route path="/modules/government" element={<GovernmentModule />} />
-                <Route path="/modules/transport" element={<TransportModule />} />
-                <Route path="/modules/color-id" element={<ColorIdModule />} />
-                <Route path="/modules/website-audit" element={<WebsiteAuditModule />} />
-                <Route path="/modules/mental-health" element={<MentalHealthModule />} />
-                <Route path="/modules/math-assistant" element={<MathAssistantModule />} />
-                <Route path="/modules/job-assistant" element={<JobAssistantModule />} />
 
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
@@ -65,4 +52,3 @@ export default function App() {
     </AccessibilityProvider>
   );
 }
-

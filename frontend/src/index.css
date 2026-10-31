@@ -2,75 +2,181 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-primary: #FAF7F0;
+  --bg-secondary: #F2ECE1;
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --text-primary: #0F121D;
+  --text-secondary: #2A3045;
+  --border-subtle: rgba(15, 18, 29, 0.14);
+  --accent-amber: #B45309;
+  --accent-amber-bright: #D97706;
+  --accent-teal: #0F766E;
+  --focus-ring: #D97706;
+}
+
+html.dark {
+  --bg-primary: #0B0C14;
+  --bg-secondary: #121526;
+  --bg-card: rgba(24, 28, 50, 0.78);
+  --text-primary: #FAF7F0;
+  --text-secondary: #E2DFD5;
+  --border-subtle: rgba(251, 191, 36, 0.18);
+  --accent-amber: #FBBF24;
+  --accent-amber-bright: #FDE68A;
+  --accent-teal: #2DD4BF;
+  --focus-ring: #FBBF24;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-family: 'Atkinson Hyperlegible', 'Inter', system-ui, sans-serif;
+    font-size: 18px; /* Minimum 18px fluid base for WCAG AAA readability */
+    line-height: 1.75;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
   }
 
-  /* Font scaling classes applied on root html/body by AccessibilityContext */
+  /* Fluid Font Size Scaling */
   html.font-scale-normal {
-    font-size: 16px;
+    font-size: 18px;
   }
   html.font-scale-large {
-    font-size: 19px;
+    font-size: 20.5px;
   }
   html.font-scale-xlarge {
-    font-size: 22px;
+    font-size: 23.5px;
   }
 
-  /* Dyslexia-friendly typography mode */
+  /* Line Spacing Controls */
+  body.line-spacing-normal {
+    line-height: 1.75;
+  }
+  body.line-spacing-relaxed {
+    line-height: 2.05;
+    letter-spacing: 0.02em;
+  }
+  body.line-spacing-wide {
+    line-height: 2.35;
+    letter-spacing: 0.04em;
+    word-spacing: 0.1em;
+  }
+
+  /* Dyslexia-Friendly Typography Mode */
   body.dyslexia-mode,
   .dyslexia-text {
-    font-family: 'OpenDyslexic', 'Comic Sans MS', 'Trebuchet MS', sans-serif !important;
+    font-family: 'OpenDyslexic', 'Atkinson Hyperlegible', sans-serif !important;
     letter-spacing: 0.06em !important;
     word-spacing: 0.14em !important;
-    line-height: 1.85 !important;
+    line-height: 1.95 !important;
   }
 
-  /* WCAG 2.1 AAA High-Contrast Mode */
+  /* WCAG 2.1 AAA Ultra High-Contrast Override (19.5:1 ratio) */
   body.high-contrast-mode {
+    --bg-primary: #000000 !important;
+    --bg-secondary: #050505 !important;
+    --bg-card: #09090B !important;
+    --text-primary: #FFFFFF !important;
+    --text-secondary: #FEF08A !important;
+    --border-subtle: #FACC15 !important;
     background-color: #000000 !important;
-    color: #ffffff !important;
+    color: #FFFFFF !important;
   }
 
+  body.high-contrast-mode .lumeo-card,
   body.high-contrast-mode .hc-card {
-    background-color: #09090b !important;
-    color: #ffffff !important;
-    border: 2px solid #facc15 !important;
+    background-color: #050505 !important;
+    color: #FFFFFF !important;
+    border: 2px solid #FACC15 !important;
+    box-shadow: none !important;
   }
 
-  body.high-contrast-mode .hc-nav {
-    background-color: #000000 !important;
-    border-color: #facc15 !important;
-  }
-
+  body.high-contrast-mode .lumeo-btn-primary,
   body.high-contrast-mode .hc-button-primary {
-    background-color: #facc15 !important;
+    background-color: #FACC15 !important;
     color: #000000 !important;
-    border: 2px solid #ffffff !important;
+    border: 2px solid #FFFFFF !important;
     font-weight: 800 !important;
   }
 
+  body.high-contrast-mode .lumeo-input,
   body.high-contrast-mode .hc-input {
     background-color: #000000 !important;
-    color: #fef08a !important;
-    border: 2px solid #ffffff !important;
+    color: #FEF08A !important;
+    border: 2px solid #FFFFFF !important;
   }
 
-  body.high-contrast-mode a,
-  body.high-contrast-mode .hc-accent {
-    color: #facc15 !important;
+  /* Respect OS prefers-reduced-motion AND user panel Reduce Motion toggle */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  body.reduce-motion *,
+  body.reduce-motion *::before,
+  body.reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* Explicit visible keyboard focus rings across all interactive elements */
+@layer components {
+  .lumeo-card {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+    backdrop-filter: blur(16px);
+  }
+
+  .lumeo-glass-Output {
+    background: linear-gradient(
+      145deg,
+      rgba(251, 191, 36, 0.07) 0%,
+      rgba(45, 212, 191, 0.05) 100%
+    );
+    border: 2px solid rgba(251, 191, 36, 0.35);
+  }
+
+  .lumeo-btn-primary {
+    min-height: 44px;
+    background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+    color: #0B0C14;
+    font-weight: 700;
+    transition: all 0.2s ease;
+  }
+
+  .lumeo-btn-primary:hover {
+    background: linear-gradient(135deg, #FBBF24 0%, #FDE68A 100%);
+    box-shadow: 0 0 28px rgba(251, 191, 36, 0.45);
+  }
+
+  .lumeo-btn-secondary {
+    min-height: 44px;
+    border: 1.5px solid var(--border-subtle);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .lumeo-input {
+    min-height: 44px;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1.5px solid var(--border-subtle);
+  }
+}
+
+/* Exemplary WCAG 2.4.7 Focus Rings */
 *:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 4px #2563eb;
+  outline: 3px solid var(--focus-ring) !important;
+  outline-offset: 3px !important;
 }
-
-body.high-contrast-mode *:focus-visible {
-  outline: 3px solid #facc15 !important;
-  box-shadow: 0 0 0 4px #ffffff !important;
-}
-

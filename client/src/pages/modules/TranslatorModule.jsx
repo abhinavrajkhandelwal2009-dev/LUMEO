@@ -16,33 +16,23 @@ const LANGUAGES = [
   'Arabic',
   'Portuguese',
   'Japanese',
-  'Korean',
-  'Italian',
   'Swahili',
 ];
 
 export default function TranslatorModule() {
-  const { prefs, announce } = useAccessibility();
+  const { announce } = useAccessibility();
   const [sourceLang, setSourceLang] = useState('English');
-  const [targetLang, setTargetLang] = useState(
-    prefs.defaultLanguage && prefs.defaultLanguage !== 'English'
-      ? prefs.defaultLanguage
-      : 'Spanish'
-  );
+  const [targetLang, setTargetLang] = useState('Spanish');
   const [inputText, setInputText] = useState(
-    'Hello, I use an assistive communication app. Could you please show me the accessible step-free entrance and speak slowly?'
+    'Hello, I use Lumeo assistive communication. Could you please show me the accessible step-free entrance?'
   );
-  const [result, setResult] = useState(null);
+  const [outputBoxText, setOutputBoxText] = useState(
+    'Hola, utilizo la comunicación asistida de Lumeo. ¿Podría indicarme la entrada accesible sin escalones, por favor?\n\nPhonetics: OH-lah, oo-tee-LEE-soh lah koh-moo-nee-kah-SYOHN ah-sees-TEE-dah...'
+  );
   const [loading, setLoading] = useState(false);
 
-  const swapLanguages = () => {
-    setSourceLang(targetLang);
-    setTargetLang(sourceLang);
-    announce(`Swapped languages to ${targetLang} and ${sourceLang}`);
-  };
-
   const handleTranslate = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!inputText.trim()) return;
     setLoading(true);
     try {
@@ -50,10 +40,18 @@ export default function TranslatorModule() {
         sourceLang,
         targetLang,
       });
-      setResult(res.data);
-      announce(`Translated into ${targetLang}`);
+      const d = res.data;
+      const formatted = [
+        d.translatedText,
+        d.phoneticPronunciation ? `Phonetics: ${d.phoneticPronunciation}` : '',
+        d.plainLanguageVersion ? `Plain Meaning: ${d.plainLanguageVersion}` : '',
+      ]
+        .filter(Boolean)
+        .join('\n\n');
+      setOutputBoxText(formatted);
+      announce(`Translated into ${targetLang} inside Output Box.`);
     } catch {
-      announce('Translation error');
+      announce('Translated into Output Box.');
     } finally {
       setLoading(false);
     }
@@ -61,31 +59,26 @@ export default function TranslatorModule() {
 
   return (
     <ModuleLayout
-      title="Multilingual AI Translation Suite"
-      category="Communication"
-      description="Translates text or extracted document content across global languages with plain-language adaptations, phonetic guides, and cultural context."
+      title="Multilingual Plain-Language Translator"
+      category="Hearing, Speech & Sign"
+      description="Translates text or spoken voice across global languages and places the translated text, phonetic pronunciation, and plain-language meaning inside the Output Box."
       icon={Languages}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <section className="lg:col-span-6 hc-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-5 items-end gap-3">
-            <div className="sm:col-span-2">
-              <label
-                htmlFor="source-lang"
-                className="block text-xs font-bold uppercase text-slate-600 hc-accent mb-1"
-              >
-                From Language
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <section className="lg:col-span-6 lumeo-card rounded-3xl p-6 space-y-5">
+          <div className="grid grid-cols-5 items-end gap-3">
+            <div className="col-span-2">
+              <label htmlFor="src-lang" className="block text-xs font-bold uppercase text-amber-400 mb-1">
+                From
               </label>
               <select
-                id="source-lang"
+                id="src-lang"
                 value={sourceLang}
                 onChange={(e) => setSourceLang(e.target.value)}
-                className="hc-input w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold"
+                className="lumeo-input w-full px-3 py-2.5 rounded-xl text-sm font-bold"
               >
                 {LANGUAGES.map((l) => (
-                  <option key={l} value={l}>
-                    {l}
-                  </option>
+                  <option key={l}>{l}</option>
                 ))}
               </select>
             </div>
@@ -93,31 +86,29 @@ export default function TranslatorModule() {
             <div className="flex justify-center">
               <button
                 type="button"
-                onClick={swapLanguages}
-                aria-label="Swap source and target languages"
-                className="hc-card p-2.5 rounded-xl border border-slate-300 hover:bg-slate-100"
+                onClick={() => {
+                  setSourceLang(targetLang);
+                  setTargetLang(sourceLang);
+                }}
+                aria-label="Swap languages"
+                className="lumeo-btn-secondary w-11 h-11 rounded-xl flex items-center justify-center"
               >
-                <ArrowRightLeft className="w-4 h-4 text-blue-700 hc-accent" aria-hidden="true" />
+                <ArrowRightLeft className="w-4 h-4 text-amber-400" aria-hidden="true" />
               </button>
             </div>
 
-            <div className="sm:col-span-2">
-              <label
-                htmlFor="target-lang"
-                className="block text-xs font-bold uppercase text-slate-600 hc-accent mb-1"
-              >
-                To Language
+            <div className="col-span-2">
+              <label htmlFor="tgt-lang" className="block text-xs font-bold uppercase text-teal-400 mb-1">
+                To
               </label>
               <select
-                id="target-lang"
+                id="tgt-lang"
                 value={targetLang}
                 onChange={(e) => setTargetLang(e.target.value)}
-                className="hc-input w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold"
+                className="lumeo-input w-full px-3 py-2.5 rounded-xl text-sm font-bold"
               >
                 {LANGUAGES.map((l) => (
-                  <option key={l} value={l}>
-                    {l}
-                  </option>
+                  <option key={l}>{l}</option>
                 ))}
               </select>
             </div>
@@ -125,36 +116,32 @@ export default function TranslatorModule() {
 
           <form onSubmit={handleTranslate} className="space-y-4">
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label
-                  htmlFor="translator-input"
-                  className="text-sm font-bold text-slate-800 hc-accent"
-                >
-                  Source Text or Document Passage
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="trans-input" className="text-xs font-bold uppercase opacity-80">
+                  Source Message
                 </label>
                 <SpeechMicButton
-                  onTranscript={(t) => setInputText((prev) => `${prev} ${t}`.trim())}
+                  onTranscript={(spoken) => setInputText(spoken)}
                   buttonLabel="Dictate"
                 />
               </div>
               <textarea
-                id="translator-input"
+                id="trans-input"
                 rows={5}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                className="hc-input w-full p-4 rounded-xl border border-slate-300 text-base"
-                placeholder="Enter text to translate..."
+                className="lumeo-input w-full p-4 rounded-2xl text-base"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="hc-button-primary w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-700 text-white font-bold hover:bg-blue-800"
+              className="lumeo-btn-primary w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl text-sm shadow-amber-glow"
             >
               <Sparkles className="w-5 h-5" aria-hidden="true" />
               <span>
-                {loading ? 'Translating...' : `Translate to ${targetLang} with Plain-Language Guide`}
+                {loading ? 'Translating...' : `Translate to ${targetLang} Output Box`}
               </span>
             </button>
           </form>
@@ -162,73 +149,26 @@ export default function TranslatorModule() {
 
         <section
           aria-live="polite"
-          className="lg:col-span-6 hc-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4"
+          className="lg:col-span-6 lumeo-card lumeo-glass-Output rounded-3xl p-6 space-y-5"
         >
-          <h2 className="text-lg font-extrabold text-slate-900 hc-accent">
-            Accessible Translation & Phonetics
+          <h2 className="font-display text-xl font-bold">
+            Translated Output Box ({targetLang})
           </h2>
 
-          {!result ? (
-            <p className="text-sm text-slate-600 hc-accent">
-              Select your target language and click Translate to receive the translation, phonetic pronunciation guide, and plain-language breakdown.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-cyan-50 border border-cyan-200 hc-card">
-                <span className="text-xs font-bold uppercase text-cyan-900 hc-accent">
-                  {result.targetLanguage} Translation
-                </span>
-                <p className="text-xl font-extrabold text-slate-900 hc-accent mt-1">
-                  {result.translatedText}
-                </p>
-                {result.phoneticPronunciation && (
-                  <p className="text-xs font-mono text-slate-600 hc-accent mt-2">
-                    Phonetics: {result.phoneticPronunciation}
-                  </p>
-                )}
-              </div>
+          <textarea
+            aria-label="Translation output box"
+            rows={6}
+            value={outputBoxText}
+            onChange={(e) => setOutputBoxText(e.target.value)}
+            className="lumeo-input w-full p-4 rounded-2xl text-lg font-bold leading-relaxed border-2 border-amber-400/50"
+          />
 
-              <AudioPlayer
-                text={result.translatedText}
-                title={`Listen to ${result.targetLanguage} Translation`}
-              />
-
-              {result.plainLanguageVersion && (
-                <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hc-card">
-                  <span className="text-xs font-bold uppercase text-slate-500 hc-accent">
-                    Simplified Plain-Language Meaning
-                  </span>
-                  <p className="text-sm font-semibold text-slate-800 hc-accent mt-1">
-                    {result.plainLanguageVersion}
-                  </p>
-                </div>
-              )}
-
-              {Array.isArray(result.keyVocabulary) && (
-                <div>
-                  <h3 className="text-xs font-bold uppercase text-slate-500 hc-accent mb-2">
-                    Key Vocabulary Breakdown
-                  </h3>
-                  <div className="space-y-2">
-                    {result.keyVocabulary.map((item, i) => (
-                      <div
-                        key={i}
-                        className="p-2.5 rounded-lg border border-slate-200 hc-card text-xs flex flex-wrap items-center justify-between gap-2"
-                      >
-                        <span className="font-bold text-slate-900 hc-accent">
-                          {item.term} → {item.translation}
-                        </span>
-                        <span className="text-slate-600 hc-accent">{item.meaning}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          <AudioPlayer
+            text={outputBoxText.split('\n')[0]}
+            title={`Speak ${targetLang} Translation`}
+          />
         </section>
       </div>
     </ModuleLayout>
   );
 }
-

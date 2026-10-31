@@ -3,15 +3,32 @@ import api from '../utils/api';
 
 const AccessibilityContext = createContext(null);
 
+const getSystemTheme = () => {
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+  return 'dark';
+};
+
+const getSystemReducedMotion = () => {
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+  return false;
+};
+
 const DEFAULT_PREFS = {
+  theme: getSystemTheme(), // 'dark' (deep indigo/obsidian) | 'light' (warm cream)
   highContrast: false,
-  fontSize: 'normal', // 'normal' | 'large' | 'xlarge'
+  fontSize: 'normal', // 'normal' (18px) | 'large' (20.5px) | 'xlarge' (23.5px)
+  lineSpacing: 'normal', // 'normal' | 'relaxed' | 'wide'
   dyslexiaFont: false,
+  reduceMotion: getSystemReducedMotion(),
   speechRate: 1.0,
   speechPitch: 1.0,
   defaultLanguage: 'English',
   globalMute: false,
-  colorOverlay: 'none', // 'none' | 'warm-amber' | 'soft-blue' | 'mint-green' | 'rose-tint'
+  colorOverlay: 'none',
 };
 
 export function AccessibilityProvider({ children }) {
@@ -26,7 +43,7 @@ export function AccessibilityProvider({ children }) {
 
   const [prefs, setPrefs] = useState(() => {
     try {
-      const saved = localStorage.getItem('lumeo_prefs');
+      const saved = localStorage.getItem('lumeo_prefs_v2');
       if (saved) return { ...DEFAULT_PREFS, ...JSON.parse(saved) };
     } catch {
       // ignore
@@ -34,29 +51,51 @@ export function AccessibilityProvider({ children }) {
     return DEFAULT_PREFS;
   });
 
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [announcement, setAnnouncement] = useState('');
 
-  // Synchronize DOM classes for WCAG high contrast, font scale, and OpenDyslexic mode
+  // Synchronize HTML & Body classes for theme, high-contrast, font-size, line-spacing, dyslexia, and reduced motion
   useEffect(() => {
     const htmlEl = document.documentElement;
     const bodyEl = document.body;
 
+    // Theme (dark / light)
+    if (prefs.theme === 'light') {
+      htmlEl.classList.remove('dark');
+    } else {
+      htmlEl.classList.add('dark');
+    }
+
+    // Font Size Scale
     htmlEl.classList.remove('font-scale-normal', 'font-scale-large', 'font-scale-xlarge');
     htmlEl.classList.add(`font-scale-${prefs.fontSize || 'normal'}`);
 
+    // Line Spacing
+    bodyEl.classList.remove('line-spacing-normal', 'line-spacing-relaxed', 'line-spacing-wide');
+    bodyEl.classList.add(`line-spacing-${prefs.lineSpacing || 'normal'}`);
+
+    // High Contrast
     if (prefs.highContrast) {
       bodyEl.classList.add('high-contrast-mode');
     } else {
       bodyEl.classList.remove('high-contrast-mode');
     }
 
+    // Dyslexia Font
     if (prefs.dyslexiaFont) {
       bodyEl.classList.add('dyslexia-mode');
     } else {
       bodyEl.classList.remove('dyslexia-mode');
     }
 
-    localStorage.setItem('lumeo_prefs', JSON.stringify(prefs));
+    // Reduce Motion
+    if (prefs.reduceMotion) {
+      bodyEl.classList.add('reduce-motion');
+    } else {
+      bodyEl.classList.remove('reduce-motion');
+    }
+
+    localStorage.setItem('lumeo_prefs_v2', JSON.stringify(prefs));
   }, [prefs]);
 
   const announce = useCallback((message) => {
@@ -105,6 +144,11 @@ export function AccessibilityProvider({ children }) {
     [prefs, user]
   );
 
+  const resetPreferences = useCallback(() => {
+    setPrefs(DEFAULT_PREFS);
+    announce('Accessibility settings reset to defaults');
+  }, [announce]);
+
   const loginUser = useCallback((token, userData) => {
     localStorage.setItem('lumeo_token', token);
     localStorage.setItem('lumeo_user', JSON.stringify(userData));
@@ -122,7 +166,6 @@ export function AccessibilityProvider({ children }) {
     announce('Signed out successfully');
   }, [stopSpeech, announce]);
 
-  // Verify user session on initial load if token exists
   useEffect(() => {
     const token = localStorage.getItem('lumeo_token');
     if (token) {
@@ -137,9 +180,7 @@ export function AccessibilityProvider({ children }) {
             }
           }
         })
-        .catch(() => {
-          // Token expired or invalid
-        });
+        .catch(() => { });
     }
   }, []);
 
@@ -150,6 +191,9 @@ export function AccessibilityProvider({ children }) {
         setUser,
         prefs,
         updatePreferences,
+        resetPreferences,
+        isPanelOpen,
+        setIsPanelOpen,
         loginUser,
         logoutUser,
         speakText,
@@ -157,13 +201,7 @@ export function AccessibilityProvider({ children }) {
         announce,
       }}
     >
-      {/* Screen Reader Live Announcement Region */}
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {announcement}
       </div>
       {children}
@@ -178,4 +216,3 @@ export function useAccessibility() {
   }
   return ctx;
 }
-

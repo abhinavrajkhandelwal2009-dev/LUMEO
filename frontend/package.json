@@ -1,8 +1,8 @@
 {
   "name": "lumeo-client",
   "private": true,
-  "version": "1.0.0",
-  "description": "LUMEO – Technology That Understands Every Ability (Vercel Client System)",
+  "version": "2.0.0",
+  "description": "LUMEO – Technology That Understands Every Ability (Luminous WCAG AAA Client)",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,6 +14,7 @@
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
+    "framer-motion": "^11.11.11",
     "lucide-react": "^0.453.0",
     "postcss": "^8.4.47",
     "react": "^18.3.1",

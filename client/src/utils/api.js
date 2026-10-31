@@ -1,8 +1,6 @@
 import axios from 'axios';
 import { CLIENT_SUPABASE_CONFIG } from '../config/supabase';
 
-// Strictly prioritize Vercel production link-up to Render backend when hosted on Vercel,
-// or local VITE_API_URL during development.
 const isVercelHost =
   typeof window !== 'undefined' &&
   window.location.hostname.endsWith('.vercel.app');
@@ -30,11 +28,20 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+const DEDICATED_ENDPOINT_MAP = {
+  'sign-language': '/ai/sign-language',
+  'visual-assistant': '/ai/visual-assist',
+  'dyslexia-reader': '/ai/dyslexia-simplify',
+  'tts-stt': '/ai/text-enhance',
+};
+
 export async function processModuleAI(module, inputData, options = {}) {
-  const response = await api.post('/ai/process', {
+  const endpoint = DEDICATED_ENDPOINT_MAP[module] || '/ai/process';
+  const response = await api.post(endpoint, {
     module,
     inputData,
     options,
+    ...options,
   });
   return response.data;
 }
